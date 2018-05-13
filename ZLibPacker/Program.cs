@@ -14,8 +14,8 @@ namespace ZLibPacker
             private static byte[] MAGIC = new byte[4] { (byte)'P', (byte)'A', (byte)'C', (byte)'K' };
             public byte[] magic { get { return MAGIC; } }
 
-            public uint fileListOffset; // distance into byte stream of file list
-            public uint numFiles;       // number of entries in file list
+            public int fileListOffset; // distance into byte stream of file list
+            public int numFiles;       // number of entries in file list
             public short version;
             public short flags;
         }
@@ -23,11 +23,47 @@ namespace ZLibPacker
         class DiskArchiveFile
         {
             public const int SIZE_IN_BYTES = 64;
+            public const int NAME_CHAR_ARRAY_SIZE = 52; // max 51 + 0 to terminate
 
 
-            public string fileName = string.Empty;      // max 51 + 0 to terminate
-            public uint offset = 0;                     // distance into byte stream of file
+            public string fileName = string.Empty;      
+            char[] _fileNameArray = new char[NAME_CHAR_ARRAY_SIZE];
+            public string fileNameArray
+            {
+                get
+                {
+                    return new string(_fileNameArray);
+                }
+            }
+
+            // distance into byte stream of file
+            public uint offset = 0;
             public uint numBytes = 0;
+
+            public void SetFileName(string str)
+            {
+                fileName = str;
+
+                int numCharsWritten = 0;
+                // skip root directory name
+                int readIndex = fileName.IndexOf("\\");
+                int nameCharsToWrite = fileName.Length - readIndex;
+
+                while (numCharsWritten < NAME_CHAR_ARRAY_SIZE)
+                {
+                    if (nameCharsToWrite > 0)
+                    {
+                        _fileNameArray[numCharsWritten] = fileName[readIndex];
+                        nameCharsToWrite--;
+                        readIndex++;
+                    }
+                    else
+                    {
+                        _fileNameArray[numCharsWritten] = (char)0;
+                    }
+                    numCharsWritten++;
+                }
+            }
 
             public int Write(byte[] bytes, int position)
             {
@@ -40,7 +76,7 @@ namespace ZLibPacker
                 }
                 
                 // Pad with NULL terminator
-                while (charsWritten < 52)
+                while (charsWritten <= 52)
                 {
                     position = ZeeBytes.Write(bytes, position, 0);
                     charsWritten++;
@@ -71,7 +107,7 @@ namespace ZLibPacker
                 }
 
                 int memSizeOfFileList = DiskArchiveFile.SIZE_IN_BYTES * list.Count;
-                Console.WriteLine("Size of file table: " + memSizeOfFileList + " bytes, or " + list.Count + " * 64");
+                Console.WriteLine("Size of file table: " + memSizeOfFileList + " bytes, or 64 * " + list.Count + " files");
 
                 // headers are stored in memory until write is finished, then appended to the end.
                 List<DiskArchiveFile> fileHeaders = new List<DiskArchiveFile>(list.Count);
@@ -102,13 +138,20 @@ namespace ZLibPacker
                     }
 
                     DiskArchiveFile file = new DiskArchiveFile();
-                    file.fileName = output;
+                    file.SetFileName(path);
                     file.numBytes = 0;
                     file.offset = 0;
+                    fileHeaders.Add(file);
+                }
 
 
-                    
-                    Console.WriteLine(output);
+                DiskArchiveHeader header = new DiskArchiveHeader();
+                header.numFiles = fileHeaders.Count;
+
+                Console.WriteLine("Manifest:");
+                foreach (DiskArchiveFile file in fileHeaders)
+                {
+                    Console.WriteLine("'" + file.fileNameArray + "' offset: " + file.offset + " size: " + file.numBytes);
                 }
             }
             catch (Exception ex)

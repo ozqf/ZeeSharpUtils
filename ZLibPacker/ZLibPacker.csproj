@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="ZLibPacker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeeBits.cs" />
     <Compile Include="ZeeBytes.cs" />

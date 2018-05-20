@@ -164,8 +164,18 @@ namespace ZLibPacker
         static void Main(string[] args)
         {
             Console.WriteLine("*** ZLib Packer ***");
-            string dir = "data01";
-            string outputFile = "data01" + ".dat";
+            
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Specify input directory, eg ZLibPacker folderName\n");
+                Console.WriteLine("\nDone");
+                Console.ReadKey();
+                return;
+            }
+
+            string dir = args[0];
+            
+            string outputFile = dir + ".dat";
             try
             {
                 List<string> list = new List<string>(100);

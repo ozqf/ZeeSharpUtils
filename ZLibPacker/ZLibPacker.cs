@@ -376,6 +376,9 @@ namespace ZLibPacker
                 string fileName = outputDir + file.fileName.Trim('\0');
                 Console.WriteLine("Writing " + fileName + ": Size: " + bytes.Length);
 
+                // Make sure directory exists
+                Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+
                 File.WriteAllBytes(fileName, bytes);
             }
         }

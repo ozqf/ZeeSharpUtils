@@ -16,7 +16,7 @@ namespace ZqfInfluenceMap
 		{
             int testWidth = 16;
             int testHeight = 24;
-            int agentCount = 1;
+            int agentCount = 10;
 			IInfluenceMap map = InfluenceMap.Create(testWidth, testHeight);
 
             Random rand = new Random(0);
@@ -80,7 +80,8 @@ namespace ZqfInfluenceMap
                 {
                     if (!GridUtilities.IsGridPosSafe(x, y, _width, _height)) { continue; }
                     float distSqr = GridUtilities.DistanceSqr(r.centreX, r.centreY, x, y);
-                    float scale = distSqr / maxDistSqr;
+                    float scale = 1f - (distSqr / maxDistSqr);
+                    if (scale < 0) { continue; }
                     float addition = val * scale;
                     _map[GridUtilities.GridPosToIndex(x, y, _width)] += addition;
                 }

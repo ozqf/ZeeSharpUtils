@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ZqfInfluenceMap;
 
 namespace ZeeSharpUtils
 {
@@ -10,6 +7,7 @@ namespace ZeeSharpUtils
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(InfluenceMap.Test());
         }
     }
 }

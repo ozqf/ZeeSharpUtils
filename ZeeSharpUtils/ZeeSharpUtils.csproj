@@ -48,5 +48,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InfluenceMap\ZqfInfluenceMap.csproj">
+      <Project>{8E4378AB-F48C-415D-A1B8-9A9B13A125DE}</Project>
+      <Name>ZqfInfluenceMap</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

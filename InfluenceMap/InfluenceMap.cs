@@ -12,11 +12,11 @@ namespace ZqfInfluenceMap
             return result;
         }
 		
-		public static string Test()
+		public static IInfluenceMap Test()
 		{
             int testWidth = 16;
             int testHeight = 24;
-            int agentCount = 10;
+            int agentCount = 1;
 			IInfluenceMap map = InfluenceMap.Create(testWidth, testHeight);
 
             Random rand = new Random(0);
@@ -28,12 +28,13 @@ namespace ZqfInfluenceMap
                 r.halfWidth = (int)rand.RandomRangef(2, 6);
                 r.halfHeight = (int)rand.RandomRangef(2, 6);
                 map.QueueBlit(r, 1);
+                map.QueueSetPixel(r.centreX, r.centreY, 9.99f);
             }
             
             map.QueueQueryForBestZero(10, 8);
             map.QueueSetPixel(1, 1, 9.99f);
 
-            return map.DebugPrint();
+            return map;
 		}
 
         #endregion
@@ -80,7 +81,7 @@ namespace ZqfInfluenceMap
                 {
                     if (!GridUtilities.IsGridPosSafe(x, y, _width, _height)) { continue; }
                     float distSqr = GridUtilities.DistanceSqr(r.centreX, r.centreY, x, y);
-                    float scale = 1f - (distSqr / maxDistSqr);
+                    float scale = 1 - (distSqr / maxDistSqr);
                     if (scale < 0) { continue; }
                     float addition = val * scale;
                     _map[GridUtilities.GridPosToIndex(x, y, _width)] += addition;
@@ -89,6 +90,14 @@ namespace ZqfInfluenceMap
         }
 
         #region IInfluenceMap
+
+        public float[] GetValuesCopy()
+        {
+            return (float[])_map.Clone();
+        }
+
+        public int width { get { return _width; } }
+        public int height { get { return _height; } }
 
         public int QueueBlit(Rect r, float val)
         {
